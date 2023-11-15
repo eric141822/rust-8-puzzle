@@ -97,11 +97,15 @@ fn print(s: &State) {
     println!();
 }
 
-fn path(s: &State) {
-    if let Some(ref p) = s.parent {
-        path(p);
+fn path(s: &State) -> i32 {
+    let mut count = 0;
+    let mut curr = s;
+    while let Some(ref p) = curr.parent {
+        print(s);
+        curr = p;
+        count += 1;
     }
-    print(s);
+    count
 }
 
 fn expand(heap: &mut BinaryHeap<State>, seen: &mut HashSet<State>, curr: &mut State) {
@@ -167,9 +171,10 @@ fn main() {
     while !heap.is_empty() {
         let mut curr = heap.pop().unwrap();
         if is_finished(&curr) {
-            path(&curr);
+            let count = path(&curr);
             let end_time = std::time::Instant::now();
             println!("Time taken: {}ms", (end_time - start_time).as_millis());
+            println!("Total moves: {}", count);
             break;
         } else if seen.len() > LIMIT {
             println!("No solution found in {} states", LIMIT);
