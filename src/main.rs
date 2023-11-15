@@ -3,7 +3,7 @@ use std::collections::{BinaryHeap, HashSet};
 use std::hash::{Hash, Hasher};
 const DIRS: [[i8; 2]; 4] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 const GOAL: [[i8; 3]; 3] = [[1, 2, 3], [4, 5, 6], [7, 8, 0]];
-const LIMIT: usize = 10000;
+const LIMIT: usize = 100000;
 #[derive(Eq, Clone)]
 struct State {
     t_cost: i32,
@@ -117,8 +117,8 @@ fn expand(heap: &mut BinaryHeap<State>, seen: &mut HashSet<State>, curr: &mut St
                     new_state.board[i][j] = a;
                     new_state.board[xx as usize][yy as usize] = b;
                     new_state.man_cost = manhatten_cost(&new_state.board);
-                    new_state.cost = curr.cost + 1 + new_state.man_cost;
-
+                    new_state.cost += 1;
+                    new_state.t_cost = new_state.cost + new_state.man_cost;
                     new_state.parent = Some(Box::new(curr.clone()));
                     if !seen.contains(&new_state) {
                         heap.push(new_state);
