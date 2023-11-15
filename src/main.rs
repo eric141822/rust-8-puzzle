@@ -3,13 +3,14 @@ use std::collections::{BinaryHeap, HashSet};
 use std::hash::{Hash, Hasher};
 const DIRS: [[i8; 2]; 4] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 const GOAL: [[i8; 3]; 3] = [[1, 2, 3], [4, 5, 6], [7, 8, 0]];
+const GOAL_POS: [(i8, i8); 8] = [(0,0), (0,1), (0,2), (1,0), (1,1), (1,2), (2,0), (2,1)];
 const LIMIT: usize = 100000;
 #[derive(Eq, Clone)]
 struct State {
     t_cost: i32,
     board: Vec<Vec<i8>>,
     cost: i32,
-    man_cost: i32,
+    man_cost: i8,
     parent: Option<Box<State>>,
 }
 
@@ -20,7 +21,7 @@ impl State {
             board: board.clone(),
             cost: 0,
             man_cost: manhatten_cost(&board),
-            t_cost: manhatten_cost(&board),
+            t_cost: manhatten_cost(&board) as i32,
             parent: None,
         }
     }
@@ -64,17 +65,13 @@ fn is_finished(s: &State) -> bool {
     true
 }
 
-fn manhatten_cost(board: &Vec<Vec<i8>>) -> i32 {
+fn manhatten_cost(board: &Vec<Vec<i8>>) -> i8 {
     let mut cost = 0;
     for i in 0..3 {
         for j in 0..3 {
-            'inner: for k in 0..3 {
-                for l in 0..3 {
-                    if board[i][j] == GOAL[k][l] {
-                        cost += (i as i32 - k as i32).abs() + (j as i32 - l as i32).abs();
-                        break 'inner;
-                    }
-                }
+            if board[i][j] != 0 {
+                let (x, y) = GOAL_POS[(board[i][j] - 1) as usize];
+                cost += (i as i8 - x).abs() + (j as i8 - y).abs();
             }
         }
     }
@@ -118,7 +115,7 @@ fn expand(heap: &mut BinaryHeap<State>, seen: &mut HashSet<State>, curr: &mut St
                     new_state.board[xx as usize][yy as usize] = b;
                     new_state.man_cost = manhatten_cost(&new_state.board);
                     new_state.cost += 1;
-                    new_state.t_cost = new_state.cost + new_state.man_cost;
+                    new_state.t_cost = new_state.cost + new_state.man_cost as i32;
                     new_state.parent = Some(Box::new(curr.clone()));
                     if !seen.contains(&new_state) {
                         heap.push(new_state);
