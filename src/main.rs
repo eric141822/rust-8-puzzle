@@ -1,6 +1,8 @@
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashSet};
 use std::hash::{Hash, Hasher};
+
+/* Constants */
 const DIRS: [[i8; 2]; 4] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 const GOAL: [[i8; 3]; 3] = [[1, 2, 3], [4, 5, 6], [7, 8, 0]];
 const GOAL_POS: [(i8, i8); 8] = [
@@ -14,6 +16,8 @@ const GOAL_POS: [(i8, i8); 8] = [
     (2, 1),
 ];
 const LIMIT: usize = 100000;
+
+/* State struct for 8-puzzle */
 #[derive(Eq, Clone)]
 struct State {
     t_cost: i32,
@@ -36,6 +40,7 @@ impl State {
     }
 }
 
+/* Trait implementations for struct State */
 impl PartialEq for State {
     fn eq(&self, other: &State) -> bool {
         self.t_cost == other.t_cost
@@ -62,7 +67,7 @@ impl Hash for State {
         }
     }
 }
-
+/* Check is state reached goal */
 fn is_finished(s: &State) -> bool {
     for i in 0..3 {
         for j in 0..3 {
@@ -73,7 +78,7 @@ fn is_finished(s: &State) -> bool {
     }
     true
 }
-
+/* Calculate the manhatten cost for a board. */
 fn manhatten_cost(board: &Vec<Vec<i8>>) -> i8 {
     let mut cost = 0;
     for i in 0..3 {
@@ -87,6 +92,7 @@ fn manhatten_cost(board: &Vec<Vec<i8>>) -> i8 {
     cost
 }
 
+/* Prints the board */
 fn print(s: &State) {
     for i in 0..3 {
         for j in 0..3 {
@@ -97,6 +103,7 @@ fn print(s: &State) {
     println!();
 }
 
+/* Traces down the path and prints each state. */
 fn path(s: &State) -> i32 {
     let mut count = 0;
     let mut curr = s;
@@ -108,6 +115,7 @@ fn path(s: &State) -> i32 {
     count
 }
 
+/* Expanding the BinaryHeap and HashSet in a DFS. */
 fn expand(heap: &mut BinaryHeap<State>, seen: &mut HashSet<State>, curr: &mut State) {
     seen.insert(curr.clone());
     for i in 0..3 {
@@ -139,6 +147,7 @@ fn expand(heap: &mut BinaryHeap<State>, seen: &mut HashSet<State>, curr: &mut St
     }
 }
 
+/* Run the A* algorithm to attempt to find a solution within LIMIT states */
 fn main() {
     let mut starting_board = vec![vec![0; 3]; 3];
     let mut numbers: HashSet<i8> = HashSet::new();
