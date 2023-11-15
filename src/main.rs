@@ -2,6 +2,8 @@ use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashSet};
 use std::hash::{Hash, Hasher};
 const DIRS: [[i8; 2]; 4] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+const GOAL: [[i8; 3]; 3] = [[1, 2, 3], [4, 5, 6], [7, 8, 0]];
+const LIMIT: usize = 10000;
 #[derive(Eq, Clone)]
 struct State {
     t_cost: i32,
@@ -52,18 +54,23 @@ impl Hash for State {
 }
 
 fn is_finished(s: &State) -> bool {
-    let goal = vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8, 0]];
-    s.board == goal
+    for i in 0..3 {
+        for j in 0..3 {
+            if s.board[i][j] != GOAL[i][j] {
+                return false;
+            }
+        }
+    }
+    true
 }
 
 fn manhatten_cost(board: &Vec<Vec<i8>>) -> i32 {
-    let goal: Vec<Vec<i8>> = vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8, 0]];
     let mut cost = 0;
     for i in 0..3 {
         for j in 0..3 {
             'inner: for k in 0..3 {
                 for l in 0..3 {
-                    if board[i][j] == goal[k][l] {
+                    if board[i][j] == GOAL[k][l] {
                         cost += (i as i32 - k as i32).abs() + (j as i32 - l as i32).abs();
                         break 'inner;
                     }
@@ -145,6 +152,7 @@ fn main() {
     let mut heap: BinaryHeap<State> = BinaryHeap::new();
     let start: State = State::new(starting_board);
     let mut seen: HashSet<State> = HashSet::new();
+    println!("-----Starting Search-----");
 
     heap.push(start);
     let start_time = std::time::Instant::now();
@@ -155,9 +163,12 @@ fn main() {
             let end_time = std::time::Instant::now();
             println!("Time taken: {}ms", (end_time - start_time).as_millis());
             break;
+        } else if seen.len() > LIMIT {
+            println!("No solution found in {} states", LIMIT);
+            break;
         } else {
             expand(&mut heap, &mut seen, &mut curr);
         }
     }
-    println!("Total states explored: {}", seen.len());
+    println!("Total states explored: {}", seen.len()-1);
 }
