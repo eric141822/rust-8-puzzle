@@ -3,7 +3,16 @@ use std::collections::{BinaryHeap, HashSet};
 use std::hash::{Hash, Hasher};
 const DIRS: [[i8; 2]; 4] = [[0, 1], [1, 0], [0, -1], [-1, 0]];
 const GOAL: [[i8; 3]; 3] = [[1, 2, 3], [4, 5, 6], [7, 8, 0]];
-const GOAL_POS: [(i8, i8); 8] = [(0,0), (0,1), (0,2), (1,0), (1,1), (1,2), (2,0), (2,1)];
+const GOAL_POS: [(i8, i8); 8] = [
+    (0, 0),
+    (0, 1),
+    (0, 2),
+    (1, 0),
+    (1, 1),
+    (1, 2),
+    (2, 0),
+    (2, 1),
+];
 const LIMIT: usize = 100000;
 #[derive(Eq, Clone)]
 struct State {
@@ -21,7 +30,7 @@ impl State {
             board: board.clone(),
             cost: 0,
             man_cost: manhatten_cost(&board),
-            t_cost: manhatten_cost(&board) as i32,
+            t_cost: 0,
             parent: None,
         }
     }
@@ -114,7 +123,7 @@ fn expand(heap: &mut BinaryHeap<State>, seen: &mut HashSet<State>, curr: &mut St
                     new_state.board[i][j] = a;
                     new_state.board[xx as usize][yy as usize] = b;
                     new_state.man_cost = manhatten_cost(&new_state.board);
-                    new_state.cost += 1;
+                    new_state.cost = 1 + curr.cost;
                     new_state.t_cost = new_state.cost + new_state.man_cost as i32;
                     new_state.parent = Some(Box::new(curr.clone()));
                     if !seen.contains(&new_state) {
@@ -147,7 +156,9 @@ fn main() {
     }
 
     let mut heap: BinaryHeap<State> = BinaryHeap::new();
-    let start: State = State::new(starting_board);
+    let mut start: State = State::new(starting_board);
+    start.t_cost = start.cost + start.man_cost as i32;
+
     let mut seen: HashSet<State> = HashSet::new();
     println!("-----Starting Search-----");
 
@@ -167,5 +178,5 @@ fn main() {
             expand(&mut heap, &mut seen, &mut curr);
         }
     }
-    println!("Total states explored: {}", seen.len()-1);
+    println!("Total states explored: {}", seen.len() - 1);
 }
