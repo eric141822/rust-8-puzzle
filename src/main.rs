@@ -192,5 +192,9 @@ fn main() {
             expand(&mut heap, &mut seen, &mut curr);
         }
     }
-    println!("Total states explored: {}", seen.len() - 1);
+    if seen.len() == 0 {
+        println!("Total states explored: {}", 0);
+    } else {
+        println!("Total states explored: {}", seen.len() - 1);
+    }
 }

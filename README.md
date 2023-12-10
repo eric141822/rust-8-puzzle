@@ -6,4 +6,4 @@ An 8 puzzle solver using A* search algorithm, developed in Rust.
 
 Clone the repository and run the following command:
 
-```cargo run```
+```cargo run --release```
