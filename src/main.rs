@@ -108,7 +108,7 @@ fn path(s: &State) -> i32 {
     let mut count = 0;
     let mut curr = s;
     while let Some(ref p) = curr.parent {
-        print(s);
+        print(curr);
         curr = p;
         count += 1;
     }
@@ -192,9 +192,5 @@ fn main() {
             expand(&mut heap, &mut seen, &mut curr);
         }
     }
-    if seen.len() == 0 {
-        println!("Total states explored: {}", 0);
-    } else {
-        println!("Total states explored: {}", seen.len() - 1);
-    }
+    println!("Total states explored: {}", if seen.len() == 0 { 0 } else {seen.len() - 1});
 }
